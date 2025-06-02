@@ -26,50 +26,48 @@ plot_acf and plot_pacf.
 
 # PROGRAM:
 ```python
+
 import pandas as pd
-from matplotlib import pyplot as plt
-from pandas.plotting import autocorrelation_plot
+import numpy as np
+import matplotlib.pyplot as plt
 from statsmodels.tsa.arima_process import ArmaProcess
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.arima.model import ARIMA
-import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
+# Load the dataset
+data = pd.read_csv('books.csv', nrows =200)
 
-# Load your india's gdp data
-gdp_data = pd.read_csv('india-gdp.csv')
+# Use the 'Close' price column
+close_prices = data['ratings_count'].dropna()
 
-# Convert 'date' column to datetime and set it as the index
-gdp_data['date'] = pd.to_datetime(gdp_data['date'])
-gdp_data.set_index('date', inplace=True)
+plt.rcParams['figure.figsize'] = [10, 7.5]
 
-# Resample the 'AnnualChange' column by day to get daily total sales
-annual_change = gdp_data['AnnualChange'].resample('D').sum()
-
-# Simulating an ARMA(1,1) Process
+# Simulate ARMA(1,1) Process
 ar1 = np.array([1, 0.33])
 ma1 = np.array([1, 0.9])
-ARMA_1 = ArmaProcess(ar1, ma1).generate_sample(nsample=1000)
+ARMA_1 = ArmaProcess(ar1, ma1).generate_sample(nsample=len(close_prices))
 plt.plot(ARMA_1)
 plt.title('Simulated ARMA(1,1) Process')
 plt.xlim([0, 200])
 plt.show()
+
+# Plot ACF and PACF for ARMA(1,1)
 plot_acf(ARMA_1)
 plot_pacf(ARMA_1)
-plt.show()
 
-# Simulating an ARMA(2,2) Process
+# Simulate ARMA(2,2) Process
 ar2 = np.array([1, 0.33, 0.5])
 ma2 = np.array([1, 0.9, 0.3])
-ARMA_2 = ArmaProcess(ar2, ma2).generate_sample(nsample=1000)
+ARMA_2 = ArmaProcess(ar2, ma2).generate_sample(nsample=len(close_prices) * 10)
 plt.plot(ARMA_2)
 plt.title('Simulated ARMA(2,2) Process')
 plt.xlim([0, 200])
 plt.show()
+
+# Plot ACF and PACF for ARMA(2,2)
 plot_acf(ARMA_2)
 plot_pacf(ARMA_2)
-plt.show()
 ```
 # OUTPUT:
 ## SIMULATED ARMA(1,1) PROCESS:
